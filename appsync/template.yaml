@@ -137,3 +137,35 @@ Resources:
           AiIntegrationDataSourceFunction:
             FunctionArn: !GetAtt AppsyncResolverLambdas.Outputs.AiIntegrationFunctionArn
             ServiceRoleArn: !GetAtt AppSyncLambdaInvokeRole.Arn
+
+      Functions:
+        generateIdeasForPostFn:
+          Runtime:
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          DataSource: AiIntegrationDataSourceFunction
+          CodeUri: ./functions/aiIntegration/generateIdeasForPost.js
+
+        generatePostsFn:
+          Runtime:
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          DataSource: AiIntegrationDataSourceFunction
+          CodeUri: ./functions/aiIntegration/generatePosts.js
+
+      Resolvers:
+        Query:
+          # AiIntegration Query
+          generateIdeasForPost:
+            Runtime:
+              Name: APPSYNC_JS
+              Version: 1.0.0
+            Pipeline:
+              - generateIdeasForPostFn
+
+          generatePosts:
+            Runtime:
+              Name: APPSYNC_JS
+              Version: 1.0.0
+            Pipeline:
+              - generatePostsFn

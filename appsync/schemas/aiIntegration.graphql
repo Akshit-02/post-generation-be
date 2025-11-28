@@ -1,0 +1,38 @@
+type PostIdea @aws_cognito_user_pools {
+  idea: ID!
+  hook: String
+  story: String
+  visualText: String
+  imagePrompt: String
+  imageUrl: String
+}
+
+type GenerateIdeasForPostResponse @aws_cognito_user_pools {
+  success: Boolean
+  message: String
+  ideas: [PostIdea]
+}
+
+input GeneratePostsInput {
+  idea: ID!
+  hook: String
+  story: String
+  visualText: String
+  imagePrompt: String
+}
+
+type GeneratePostResponse @aws_cognito_user_pools {
+  success: Boolean
+  message: String
+  posts: [PostIdea]
+}
+
+type Query {
+  generateIdeasForPost(
+    userId: ID!
+    industry: String!
+  ): GenerateIdeasForPostResponse @aws_cognito_user_pools
+
+  generatePosts(input: [GeneratePostsInput]!): GeneratePostResponse
+    @aws_cognito_user_pools
+}

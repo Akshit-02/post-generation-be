@@ -1,3 +1,5 @@
+import { generateIdeasForPostHandler } from "./resolvers/generateIdeasForPost.js";
+import { generatePostsHandler } from "./resolvers/generatePosts.js";
 import Logger from "/opt/nodejs/logger.js";
 
 export const handler = async (event) => {
@@ -6,6 +8,10 @@ export const handler = async (event) => {
 
   try {
     switch (fieldName) {
+      case "generateIdeasForPost":
+        return await generateIdeasForPostHandler(event);
+      case "generatePosts":
+        return await generatePostsHandler(event);
       default:
         throw new Error(`Unsupported operation: ${fieldName}`);
     }

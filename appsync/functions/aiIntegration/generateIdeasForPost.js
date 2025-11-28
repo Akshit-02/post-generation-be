@@ -6,7 +6,7 @@ export function request(ctx) {
       arguments: args,
       source,
       identity: ctx.identity,
-      fieldName: "manageIgPostSchedule",
+      fieldName: "generateIdeasForPost",
     },
   };
 }
