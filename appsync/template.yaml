@@ -50,6 +50,18 @@ Parameters:
   UsersTableArn:
     Type: String
     Description: ARN of the DynamoDB Users table
+  PublishedPostsTableName:
+    Type: String
+    Description: Name of the DynamoDB PublishedPosts table
+  PublishedPostsTableArn:
+    Type: String
+    Description: ARN of the DynamoDB PublishedPosts table
+  SavedPostsTableName:
+    Type: String
+    Description: Name of the DynamoDB SavedPosts table
+  SavedPostsTableArn:
+    Type: String
+    Description: ARN of the DynamoDB SavedPosts table
 
 Resources:
   AppSyncLambdaInvokeRole:
@@ -128,6 +140,14 @@ Resources:
             TableName: !Ref UsersTableName
             TableArn: !Ref UsersTableArn
             ServiceRoleArn: !GetAtt DynamodbServiceRole.Arn
+          PublishedPostsDataSource:
+            TableName: !Ref PublishedPostsTableName
+            TableArn: !Ref PublishedPostsTableArn
+            ServiceRoleArn: !GetAtt DynamodbServiceRole.Arn
+          SavedPostsDataSource:
+            TableName: !Ref SavedPostsTableName
+            TableArn: !Ref SavedPostsTableArn
+            ServiceRoleArn: !GetAtt DynamodbServiceRole.Arn
 
         Lambda:
           AiIntegrationDataSourceFunction:
@@ -149,6 +169,32 @@ Resources:
           DataSource: AiIntegrationDataSourceFunction
           CodeUri: ./functions/aiIntegration/generatePosts.js
 
+        createPublishedPostFn:
+          Runtime:
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          DataSource: PublishedPostsDataSource
+          CodeUri: ./functions/crud/create.js
+        getPublishedPostByUserIdFn:
+          Runtime:
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          DataSource: PublishedPostsDataSource
+          CodeUri: ./functions/publishedPosts/getPublishedPostByUserId.js
+
+        createSavedPostFn:
+          Runtime:
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          DataSource: SavedPostsDataSource
+          CodeUri: ./functions/crud/create.js
+        getSavedPostByUserIdFn:
+          Runtime:
+            Name: APPSYNC_JS
+            Version: 1.0.0
+          DataSource: SavedPostsDataSource
+          CodeUri: ./functions/savedPosts/getSavedPostByUserId.js
+
       Resolvers:
         Query:
           # AiIntegration Query
@@ -165,3 +211,18 @@ Resources:
               Version: 1.0.0
             Pipeline:
               - generatePostsFn
+
+        Mutation:
+          createPublishedPost:
+            Runtime:
+              Name: APPSYNC_JS
+              Version: 1.0.0
+            Pipeline:
+              - createPublishedPostFn
+
+          createSavedPost:
+            Runtime:
+              Name: APPSYNC_JS
+              Version: 1.0.0
+            Pipeline:
+              - createSavedPostFn

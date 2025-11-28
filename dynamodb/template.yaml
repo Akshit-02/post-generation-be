@@ -38,6 +38,60 @@ Resources:
     UpdateReplacePolicy: Delete
     DeletionPolicy: Delete
 
+  PublishedPostsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub "${StackName}-published-posts"
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+        - AttributeName: userId
+          AttributeType: S
+        - AttributeName: createdAt
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: publisedPostsByUserId
+          KeySchema:
+            - AttributeName: userId
+              KeyType: HASH
+            - AttributeName: createdAt
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+      BillingMode: PAY_PER_REQUEST
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+
+  SavedPostsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub "${StackName}-saved-posts"
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+        - AttributeName: userId
+          AttributeType: S
+        - AttributeName: createdAt
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: savedPostsByUserId
+          KeySchema:
+            - AttributeName: userId
+              KeyType: HASH
+            - AttributeName: createdAt
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+      BillingMode: PAY_PER_REQUEST
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+
 Outputs:
   UsersTableName:
     Description: "Name of the Users table"
@@ -45,3 +99,15 @@ Outputs:
   UsersTableArn:
     Description: "ARN of the Users table"
     Value: !GetAtt UsersTable.Arn
+  PublishedPostsTableName:
+    Description: "Name of the PublishedPosts table"
+    Value: !Ref PublishedPostsTable
+  PublishedPostsTableArn:
+    Description: "ARN of the PublishedPosts table"
+    Value: !GetAtt PublishedPostsTable.Arn
+  SavedPostsTableName:
+    Description: "Name of the SavedPosts table"
+    Value: !Ref SavedPostsTable
+  SavedPostsTableArn:
+    Description: "ARN of the SavedPosts table"
+    Value: !GetAtt SavedPostsTable.Arn

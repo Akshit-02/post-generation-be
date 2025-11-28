@@ -7,17 +7,20 @@ const {
 
 export const generateImage = async (item) => {
   const prompt = `
-Create an Instagram post-style image.
+Create a high-quality Instagram post-style image.
 
 Visual Requirements:
 - Background: ${item.imagePrompt}
-- Add text overlay: "${item.visualText}"
-- Text should be clearly readable (bold, high contrast, centered or clean placement)
-- Modern minimal design, no clutter, professional looking
-- Include slight depth or blur in background if needed for text clarity
+- Add text overlay in **clear, readable English**: "${item.visualText}"
+- Use professional graphic design layout.
+- Text must be sharp, high-resolution, correctly spelled, and not distorted.
+- Bold typography, high contrast against background, positioned cleanly.
+- No visual glitches, no random characters, no decorative distortions.
+- Modern minimal design, no clutter.
+- If needed, slightly blur only the background to increase text clarity.
 
-Generate only the image as output.
-  `;
+Generate only the image.
+`;
 
   const response = await fetch(
     `https://router.huggingface.co/hf-inference/models/${MODEL}`,

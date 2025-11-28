@@ -111,3 +111,7 @@ Resources:
         HuggingFaceApiKey: !Ref HuggingFaceApiKey
         UsersTableName: !GetAtt DynamoDB.Outputs.UsersTableName
         UsersTableArn: !GetAtt DynamoDB.Outputs.UsersTableArn
+        PublishedPostsTableName: !GetAtt DynamoDB.Outputs.PublishedPostsTableName
+        PublishedPostsTableArn: !GetAtt DynamoDB.Outputs.PublishedPostsTableArn
+        SavedPostsTableName: !GetAtt DynamoDB.Outputs.SavedPostsTableName
+        SavedPostsTableArn: !GetAtt DynamoDB.Outputs.SavedPostsTableArn

@@ -1,4 +1,4 @@
-type PostIdea @aws_cognito_user_pools @aws_api_key {
+type PostIdea @aws_cognito_user_pools {
   idea: String
   hook: String
   story: String
@@ -8,7 +8,7 @@ type PostIdea @aws_cognito_user_pools @aws_api_key {
   imageUrl: String
 }
 
-type GenerateIdeasForPostResponse @aws_cognito_user_pools @aws_api_key {
+type GenerateIdeasForPostResponse @aws_cognito_user_pools {
   success: Boolean
   message: String
   ideas: [PostIdea]
@@ -22,21 +22,53 @@ input GeneratePostsInput {
   imagePrompt: String
 }
 
-type GeneratePostResponse @aws_cognito_user_pools @aws_api_key {
+type GeneratePostResponse @aws_cognito_user_pools {
   success: Boolean
   message: String
   posts: [PostIdea]
 }
 
 type Query {
-  generateIdeasForPost(industry: String!): GenerateIdeasForPostResponse @aws_cognito_user_pools @aws_api_key
-  generatePosts(input: [GeneratePostsInput]!): GeneratePostResponse @aws_cognito_user_pools @aws_api_key
+  generateIdeasForPost(industry: String!): GenerateIdeasForPostResponse @aws_cognito_user_pools
+  generatePosts(input: [GeneratePostsInput]!): GeneratePostResponse @aws_cognito_user_pools
+  getPublishedPostByUserId(userId: String!): PublishedPostResponse @aws_cognito_user_pools
+  getSavedPostByUserId(userId: String!): SavedPostResponse @aws_cognito_user_pools
   getUserById(id: String!): User @aws_cognito_user_pools
 }
 
 type SyncResponse @aws_cognito_user_pools {
   success: Boolean!
   message: String
+}
+
+type PublishedPost @aws_cognito_user_pools {
+  id: String!
+  userId: String!
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
+}
+
+type PublishedPostResponse @aws_cognito_user_pools {
+  items: [PublishedPost]
+  nextToken: String
+}
+
+type Mutation {
+  createPublishedPost(userId: String!): PublishedPost @aws_cognito_user_pools
+  createSavedPost(userId: String!): SavedPost @aws_cognito_user_pools
+  linkInstagramAccount(input: LinkInstagramAccountInput!): SyncResponse @aws_cognito_user_pools
+}
+
+type SavedPost @aws_cognito_user_pools {
+  id: String!
+  userId: String!
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
+}
+
+type SavedPostResponse @aws_cognito_user_pools {
+  items: [SavedPost]
+  nextToken: String
 }
 
 type User @aws_cognito_user_pools {
@@ -54,10 +86,6 @@ type User @aws_cognito_user_pools {
 input LinkInstagramAccountInput {
   id: String
   authCode: String
-}
-
-type Mutation {
-  linkInstagramAccount(input: LinkInstagramAccountInput!): SyncResponse @aws_cognito_user_pools
 }
 
 schema {

@@ -1,4 +1,4 @@
-type PostIdea @aws_cognito_user_pools @aws_api_key {
+type PostIdea @aws_cognito_user_pools {
   idea: String
   hook: String
   story: String
@@ -8,7 +8,7 @@ type PostIdea @aws_cognito_user_pools @aws_api_key {
   imageUrl: String
 }
 
-type GenerateIdeasForPostResponse @aws_cognito_user_pools @aws_api_key {
+type GenerateIdeasForPostResponse @aws_cognito_user_pools {
   success: Boolean
   message: String
   ideas: [PostIdea]
@@ -22,7 +22,7 @@ input GeneratePostsInput {
   imagePrompt: String
 }
 
-type GeneratePostResponse @aws_cognito_user_pools @aws_api_key {
+type GeneratePostResponse @aws_cognito_user_pools {
   success: Boolean
   message: String
   posts: [PostIdea]
@@ -31,9 +31,7 @@ type GeneratePostResponse @aws_cognito_user_pools @aws_api_key {
 type Query {
   generateIdeasForPost(industry: String!): GenerateIdeasForPostResponse
     @aws_cognito_user_pools
-    @aws_api_key
 
   generatePosts(input: [GeneratePostsInput]!): GeneratePostResponse
     @aws_cognito_user_pools
-    @aws_api_key
 }
