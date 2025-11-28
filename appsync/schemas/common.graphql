@@ -1,11 +1,3 @@
-enum API_ACTIONS {
-  GET
-  LIST
-  CREATE
-  UPDATE
-  DELETE
-}
-
 type SyncResponse @aws_cognito_user_pools {
   success: Boolean!
   message: String

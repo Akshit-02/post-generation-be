@@ -17,11 +17,11 @@ Resources:
       Description: Dependencies for lambda
       ContentUri: common
       CompatibleRuntimes:
-        - nodejs20.x
+        - nodejs22.x
     UpdateReplacePolicy: Delete
     DeletionPolicy: Delete
     Metadata:
-      BuildMethod: nodejs20.x
+      BuildMethod: nodejs22.x
 
   DynamoDBLayer:
     Type: AWS::Serverless::LayerVersion
@@ -30,11 +30,11 @@ Resources:
       Description: DynamoDB
       ContentUri: dynamodb
       CompatibleRuntimes:
-        - nodejs20.x
+        - nodejs22.x
     UpdateReplacePolicy: Delete
     DeletionPolicy: Delete
     Metadata:
-      BuildMethod: nodejs20.x
+      BuildMethod: nodejs22.x
 
   UtilsLayer:
     Type: AWS::Serverless::LayerVersion
@@ -43,11 +43,11 @@ Resources:
       Description: Utils
       ContentUri: utils
       CompatibleRuntimes:
-        - nodejs20.x
+        - nodejs22.x
     UpdateReplacePolicy: Delete
     DeletionPolicy: Delete
     Metadata:
-      BuildMethod: nodejs20.x
+      BuildMethod: nodejs22.x
 
 Outputs:
   CommonLambdaLayer:

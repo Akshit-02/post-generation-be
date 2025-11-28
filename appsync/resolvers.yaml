@@ -36,6 +36,14 @@ Parameters:
     Type: String
     Description: Instagram App Secret
     NoEcho: true
+  GroqApiKey:
+    Type: String
+    Description: Groq API Key
+    NoEcho: true
+  HuggingFaceApiKey:
+    Type: String
+    Description: Hugging Face API Key
+    NoEcho: true
   UsersTableName:
     Type: String
     Description: DynamoDB Users table name
@@ -48,13 +56,17 @@ Resources:
       CodeUri: handlers/aiIntegration
       Handler: index.handler
       Role: !Ref LambdaRoleArn
-      Runtime: nodejs20.x
+      Runtime: nodejs22.x
       Timeout: 900
       Environment:
         Variables:
           ENVIRONMENT: !Ref Environment
           LOG_LEVEL: !Ref LogLevel
           S3_BUCKET_NAME: !Ref MediaAssetsBucketName
+          INSTAGRAM_APP_ID: !Ref InstagramAppId
+          INSTAGRAM_APP_SECRET: !Ref InstagramAppSecret
+          GROQ_API_KEY: !Ref GroqApiKey
+          HUGGING_FACE_API_KEY: !Ref HuggingFaceApiKey
       Layers:
         - !Ref CommonLambdaLayer
         - !Ref UtilsLayer

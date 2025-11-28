@@ -39,6 +39,14 @@ Parameters:
     Type: String
     Description: Instagram App Secret
     NoEcho: true
+  GroqApiKey:
+    Type: String
+    Description: Groq API Key
+    NoEcho: true
+  HuggingFaceApiKey:
+    Type: String
+    Description: Hugging Face API Key
+    NoEcho: true
   UsersTableName:
     Type: String
     Description: Name of the DynamoDB Users table
@@ -97,6 +105,8 @@ Resources:
         UtilsLayer: !Ref UtilsLayer
         InstagramAppId: !Ref InstagramAppId
         InstagramAppSecret: !Ref InstagramAppSecret
+        GroqApiKey: !Ref GroqApiKey
+        HuggingFaceApiKey: !Ref HuggingFaceApiKey
         UsersTableName: !Ref UsersTableName
 
   GraphQLAPI:

@@ -1,4 +1,3 @@
-import { analyzeCommentsBatchHandler } from "./resolvers/analyzeCommentsBatch.js";
 import Logger from "/opt/nodejs/logger.js";
 
 export const handler = async (event) => {
@@ -7,8 +6,6 @@ export const handler = async (event) => {
 
   try {
     switch (fieldName) {
-      case "analyzeCommentsBatch":
-        return analyzeCommentsBatchHandler(event);
       default:
         throw new Error(`Unsupported operation: ${fieldName}`);
     }

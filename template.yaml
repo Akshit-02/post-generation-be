@@ -26,6 +26,14 @@ Parameters:
     Type: String
     Description: Instagram App Secret
     NoEcho: true
+  GroqApiKey:
+    Type: String
+    Description: Groq API Key
+    NoEcho: true
+  HuggingFaceApiKey:
+    Type: String
+    Description: Hugging Face API Key
+    NoEcho: true
 
 Resources:
   LambdaRole:
@@ -101,5 +109,7 @@ Resources:
         UtilsLayer: !GetAtt LambdaLayers.Outputs.UtilsLayer
         InstagramAppId: !Ref InstagramAppId
         InstagramAppSecret: !Ref InstagramAppSecret
+        GroqApiKey: !Ref GroqApiKey
+        HuggingFaceApiKey: !Ref HuggingFaceApiKey
         UsersTableName: !GetAtt DynamoDB.Outputs.UsersTableName
         UsersTableArn: !GetAtt DynamoDB.Outputs.UsersTableArn

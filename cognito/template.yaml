@@ -31,7 +31,7 @@ Parameters:
 
 Globals:
   Function:
-    Runtime: nodejs20.x
+    Runtime: nodejs22.x
     Timeout: 900
     Environment:
       Variables:
@@ -79,6 +79,36 @@ Resources:
       FunctionName: !GetAtt UserPostConfirmationFunction.Arn
       Principal: cognito-idp.amazonaws.com
       SourceArn: !GetAtt UserCognitoUserPool.Arn
+
+  UserCognitoUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Sub "${StackName}-users-user-pool"
+      AdminCreateUserConfig:
+        AllowAdminCreateUserOnly: false
+      AutoVerifiedAttributes:
+        - email
+      UsernameAttributes:
+        - email
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireLowercase: true
+          RequireNumbers: true
+          RequireSymbols: true
+          RequireUppercase: true
+      Schema:
+        - Name: email
+          AttributeDataType: String
+          Mutable: true
+          Required: true
+        - Name: phone_number
+          AttributeDataType: String
+          Mutable: true
+          Required: false
+      LambdaConfig:
+        PreSignUp: !GetAtt UserPreSignupFunction.Arn
+        PostConfirmation: !GetAtt UserPostConfirmationFunction.Arn
 
   UserCognitoUserPoolClient:
     Type: AWS::Cognito::UserPoolClient
