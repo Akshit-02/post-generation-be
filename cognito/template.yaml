@@ -1,0 +1,156 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Cognito Authentication for Instagram Automation
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+  StackName:
+    Type: String
+    Default: post-generation-dev
+  LogLevel:
+    Type: String
+    Default: INFO
+    Description: Log level for Lambda functions
+  LambdaRoleArn:
+    Type: String
+    Description: ARN of the Lambda execution role
+  CommonLambdaLayer:
+    Type: String
+    Description: ARN of the Common Lambda layer
+  DynamoDBLayer:
+    Type: String
+    Description: ARN of the DynamoDB Lambda layer
+  UtilsLayer:
+    Type: String
+    Description: ARN of the Utils Lambda layer
+  UsersTableName:
+    Type: String
+    Description: Name of the DynamoDB Users table
+
+Globals:
+  Function:
+    Runtime: nodejs20.x
+    Timeout: 900
+    Environment:
+      Variables:
+        ENVIRONMENT: !Ref Environment
+        STACK_NAME: !Ref StackName
+        LOG_LEVEL: !Ref LogLevel
+        USERS_TABLE: !Ref UsersTableName
+
+Resources:
+  UserPreSignupFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/users/pre-signup/
+      FunctionName: !Sub "${StackName}-users-pre-signup"
+      Handler: index.handler
+      Role: !Ref LambdaRoleArn
+      Layers:
+        - !Ref CommonLambdaLayer
+        - !Ref UtilsLayer
+
+  UserPostConfirmationFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/users/post-confirmation/
+      FunctionName: !Sub "${StackName}-users-post-confirmation"
+      Handler: index.handler
+      Role: !Ref LambdaRoleArn
+      Layers:
+        - !Ref CommonLambdaLayer
+        - !Ref UtilsLayer
+        - !Ref DynamoDBLayer
+
+  UserPreSignupPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !GetAtt UserPreSignupFunction.Arn
+      Principal: cognito-idp.amazonaws.com
+      SourceArn: !GetAtt UserCognitoUserPool.Arn
+
+  UserPostConfirmationPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !GetAtt UserPostConfirmationFunction.Arn
+      Principal: cognito-idp.amazonaws.com
+      SourceArn: !GetAtt UserCognitoUserPool.Arn
+
+  UserCognitoUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: !Sub "${StackName}-users-user-pool-client"
+      UserPoolId: !Ref UserCognitoUserPool
+      ExplicitAuthFlows:
+        - ALLOW_USER_SRP_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+      PreventUserExistenceErrors: ENABLED
+      GenerateSecret: false
+
+  CognitoIdentityPool:
+    Type: AWS::Cognito::IdentityPool
+    Properties:
+      IdentityPoolName: !Sub "${StackName}-identity-pool"
+      AllowUnauthenticatedIdentities: true
+      CognitoIdentityProviders:
+        - ClientId: !Ref UserCognitoUserPoolClient
+          ProviderName: !GetAtt UserCognitoUserPool.ProviderName
+          ServerSideTokenCheck: true
+
+  CognitoAuthenticatedRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${StackName}-cognito-authenticated-role"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated: cognito-identity.amazonaws.com
+            Action: sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringEquals:
+                cognito-identity.amazonaws.com:aud: !Ref CognitoIdentityPool
+              ForAnyValue:StringLike:
+                cognito-identity.amazonaws.com:amr: authenticated
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+
+  CognitoUnauthenticatedRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${StackName}-cognito-unauthenticated-role"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated: cognito-identity.amazonaws.com
+            Action: sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringEquals:
+                cognito-identity.amazonaws.com:aud: !Ref CognitoIdentityPool
+              ForAnyValue:StringLike:
+                cognito-identity.amazonaws.com:amr: unauthenticated
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
+
+  CognitoIdentityPoolRoleAttachment:
+    Type: AWS::Cognito::IdentityPoolRoleAttachment
+    Properties:
+      IdentityPoolId: !Ref CognitoIdentityPool
+      Roles:
+        authenticated: !GetAtt CognitoAuthenticatedRole.Arn
+        unauthenticated: !GetAtt CognitoUnauthenticatedRole.Arn
+
+Outputs:
+  UserUserPoolId:
+    Description: "ID of the User Cognito User Pool"
+    Value: !Ref UserCognitoUserPool
+  UserUserPoolClientId:
+    Description: "ID of the User Cognito User Pool Client"
+    Value: !Ref UserCognitoUserPoolClient

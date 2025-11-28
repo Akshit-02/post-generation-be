@@ -1,0 +1,51 @@
+type InstagramDetails @aws_cognito_user_pools {
+  id: String
+  userId: String
+  profilePictureUrl: String
+  username: String
+  name: String
+  accountType: String
+  followersCount: Int
+  followsCount: Int
+  mediaCount: Int
+  isInstagramSubscribed: Boolean
+  instagramRefreshToken: String
+  instagramRefreshTokenUpdatedAt: AWSDateTime
+  updatedAt: AWSDateTime
+}
+
+type User @aws_cognito_user_pools {
+  id: String!
+  name: String
+  phoneNo: String
+  email: String!
+  instagramDetails: InstagramDetails
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
+}
+
+input UserInput {
+  id: String!
+  name: String
+  phoneNo: String
+  email: String
+}
+
+input LinkInstagramAccountInput {
+  userId: String
+  authCode: String
+}
+
+type UserResult @aws_cognito_user_pools {
+  success: Boolean
+  message: String
+  items: [User]
+}
+
+type Mutation {
+  manageUser(action: API_ACTIONS!, input: UserInput!): UserResult
+    @aws_cognito_user_pools
+
+  linkInstagramAccount(input: LinkInstagramAccountInput!): SyncResponse
+    @aws_cognito_user_pools
+}

@@ -1,0 +1,105 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Instagram Automation
+
+Globals:
+  Function:
+    Timeout: 900
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+  StackName:
+    Type: String
+    Default: post-generation-dev
+  LogLevel:
+    Type: String
+    Default: INFO
+    Description: Log level for Lambda functions
+  InstagramAppId:
+    Type: String
+    Description: Instagram App ID
+    NoEcho: true
+  InstagramAppSecret:
+    Type: String
+    Description: Instagram App Secret
+    NoEcho: true
+
+Resources:
+  LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${StackName}-lambda-role"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+
+  LambdaLayers:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: ./layers/template.yaml
+      Parameters:
+        Environment: !Ref Environment
+        StackName: !Ref StackName
+
+  S3Bucket:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: ./s3/template.yaml
+      Parameters:
+        Environment: !Ref Environment
+        StackName: !Ref StackName
+
+  DynamoDB:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: ./dynamodb/template.yaml
+      Parameters:
+        Environment: !Ref Environment
+        StackName: !Ref StackName
+        LogLevel: !Ref LogLevel
+
+  Cognito:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: ./cognito/template.yaml
+      Parameters:
+        Environment: !Ref Environment
+        StackName: !Ref StackName
+        LogLevel: !Ref LogLevel
+        LambdaRoleArn: !GetAtt LambdaRole.Arn
+        CommonLambdaLayer: !GetAtt LambdaLayers.Outputs.CommonLambdaLayer
+        DynamoDBLayer: !GetAtt LambdaLayers.Outputs.DynamoDBLayer
+        UtilsLayer: !GetAtt LambdaLayers.Outputs.UtilsLayer
+        UsersTableName: !GetAtt DynamoDB.Outputs.UsersTableName
+
+  AppSync:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: ./appsync/template.yaml
+      Parameters:
+        Environment: !Ref Environment
+        StackName: !Ref StackName
+        LogLevel: !Ref LogLevel
+        MediaAssetsBucketName: !GetAtt S3Bucket.Outputs.MediaAssetsBucketName
+        UserUserPoolId: !GetAtt Cognito.Outputs.UserUserPoolId
+        LambdaRoleArn: !GetAtt LambdaRole.Arn
+        CommonLambdaLayer: !GetAtt LambdaLayers.Outputs.CommonLambdaLayer
+        DynamoDBLayer: !GetAtt LambdaLayers.Outputs.DynamoDBLayer
+        UtilsLayer: !GetAtt LambdaLayers.Outputs.UtilsLayer
+        InstagramAppId: !Ref InstagramAppId
+        InstagramAppSecret: !Ref InstagramAppSecret
+        UsersTableName: !GetAtt DynamoDB.Outputs.UsersTableName
+        UsersTableArn: !GetAtt DynamoDB.Outputs.UsersTableArn

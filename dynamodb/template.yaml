@@ -1,0 +1,47 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: DynamoDB resources for Instagram Automation
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+  StackName:
+    Type: String
+    Default: post-generation-dev
+  LogLevel:
+    Type: String
+    Default: INFO
+
+Globals:
+  Function:
+    Runtime: nodejs20.x
+    Timeout: 900
+    Environment:
+      Variables:
+        ENVIRONMENT: !Ref Environment
+        STACK_NAME: !Ref StackName
+        LOG_LEVEL: !Ref LogLevel
+
+Resources:
+  UsersTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub "${StackName}-users"
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+
+Outputs:
+  UsersTableName:
+    Description: "Name of the Users table"
+    Value: !Ref UsersTable
+  UsersTableArn:
+    Description: "ARN of the Users table"
+    Value: !GetAtt UsersTable.Arn

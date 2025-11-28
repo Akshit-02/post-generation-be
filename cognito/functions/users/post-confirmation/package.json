@@ -1,0 +1,12 @@
+{
+  "name": "post-confirmation",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "",
+  "license": "MIT",
+  "type": "module",
+  "description": "",
+  "dependencies": {
+    "uuid": "^11.1.0"
+  }
+}

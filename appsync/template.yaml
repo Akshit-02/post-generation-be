@@ -1,0 +1,129 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: AppSync API for Instagram Automation
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+  StackName:
+    Type: String
+    Default: post-generation-dev
+  LogLevel:
+    Type: String
+    Default: INFO
+    Description: Log level for Lambda functions
+  MediaAssetsBucketName:
+    Type: String
+    Description: Name of the S3 media assets bucket
+  LambdaRoleArn:
+    Type: String
+    Description: ARN of the Lambda execution role
+  CommonLambdaLayer:
+    Type: String
+    Description: ARN of the Common Lambda layer
+  DynamoDBLayer:
+    Type: String
+    Description: ARN of the DynamoDB Lambda layer
+  UtilsLayer:
+    Type: String
+    Description: ARN of the Utils Lambda layer
+  UserUserPoolId:
+    Type: String
+    Description: Cognito User User Pool ID for API authentication
+  InstagramAppId:
+    Type: String
+    Description: Instagram App ID
+    NoEcho: true
+  InstagramAppSecret:
+    Type: String
+    Description: Instagram App Secret
+    NoEcho: true
+  UsersTableName:
+    Type: String
+    Description: Name of the DynamoDB Users table
+  UsersTableArn:
+    Type: String
+    Description: ARN of the DynamoDB Users table
+
+Resources:
+  AppSyncLambdaInvokeRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: appsync.amazonaws.com
+        Version: "2012-10-17"
+      Policies:
+        - PolicyName: LambdaInvokePolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource: "*"
+
+  DynamodbServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: appsync.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+
+  AppsyncResolverLambdas:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: ./resolvers.yaml
+      Parameters:
+        Environment: !Ref Environment
+        StackName: !Ref StackName
+        LogLevel: !Ref LogLevel
+        MediaAssetsBucketName: !Ref MediaAssetsBucketName
+        LambdaRoleArn: !Ref LambdaRoleArn
+        CommonLambdaLayer: !Ref CommonLambdaLayer
+        DynamoDBLayer: !Ref DynamoDBLayer
+        UtilsLayer: !Ref UtilsLayer
+        InstagramAppId: !Ref InstagramAppId
+        InstagramAppSecret: !Ref InstagramAppSecret
+        UsersTableName: !Ref UsersTableName
+
+  GraphQLAPI:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      Name: !Sub "${StackName}-graphql-api"
+      SchemaUri: ./schema.graphql
+      Logging: false
+      Auth:
+        Type: API_KEY
+        Additional:
+          - Type: AMAZON_COGNITO_USER_POOLS
+            UserPool:
+              AwsRegion: !Ref AWS::Region
+              UserPoolId: !Ref UserUserPoolId
+              DefaultAction: ALLOW
+      ApiKeys:
+        AppSyncKey:
+          ApiKeyId: !Sub "${StackName}-api-key"
+      DataSources:
+        DynamoDb:
+          UsersDataSource:
+            TableName: !Ref UsersTableName
+            TableArn: !Ref UsersTableArn
+            ServiceRoleArn: !GetAtt DynamodbServiceRole.Arn
+
+        Lambda:
+          AiIntegrationDataSourceFunction:
+            FunctionArn: !GetAtt AppsyncResolverLambdas.Outputs.AiIntegrationFunctionArn
+            ServiceRoleArn: !GetAtt AppSyncLambdaInvokeRole.Arn

@@ -1,0 +1,58 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Lambda layer for Instagram Automation
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+  StackName:
+    Type: String
+    Default: post-generation-dev
+
+Resources:
+  CommonLambdaLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: !Sub "${StackName}-common-lambda-layer"
+      Description: Dependencies for lambda
+      ContentUri: common
+      CompatibleRuntimes:
+        - nodejs20.x
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Metadata:
+      BuildMethod: nodejs20.x
+
+  DynamoDBLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: !Sub "${StackName}-dynamodb-layer"
+      Description: DynamoDB
+      ContentUri: dynamodb
+      CompatibleRuntimes:
+        - nodejs20.x
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Metadata:
+      BuildMethod: nodejs20.x
+
+  UtilsLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: !Sub "${StackName}-utils-layer"
+      Description: Utils
+      ContentUri: utils
+      CompatibleRuntimes:
+        - nodejs20.x
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Metadata:
+      BuildMethod: nodejs20.x
+
+Outputs:
+  CommonLambdaLayer:
+    Value: !Ref CommonLambdaLayer
+  DynamoDBLayer:
+    Value: !Ref DynamoDBLayer
+  UtilsLayer:
+    Value: !Ref UtilsLayer

@@ -1,0 +1,100 @@
+type AnalysisScore {
+  score: Int!
+  detected: Boolean!
+  keywords: [String]
+}
+
+type CommentAnalysis {
+  vulgarity: AnalysisScore!
+  nudity: AnalysisScore!
+  violence: AnalysisScore!
+  hate_speech: AnalysisScore!
+  spam: AnalysisScore!
+  harassment: AnalysisScore!
+  overall_risk: String!
+  language_detected: String!
+  summary: String!
+  error: Boolean
+  script_detected: String
+  cultural_context: String
+  requires_human_review: Boolean
+  error_message: String
+  analyzed_at: String
+  is_hinglish: Boolean
+}
+
+type CommentAnalysisResult {
+  commentId: String!
+  analysis: CommentAnalysis!
+}
+
+type Query {
+  analyzeCommentsBatch(comments: [String!]): [CommentAnalysisResult] @aws_cognito_user_pools
+}
+
+enum API_ACTIONS {
+  GET
+  LIST
+  CREATE
+  UPDATE
+  DELETE
+}
+
+type SyncResponse @aws_cognito_user_pools {
+  success: Boolean!
+  message: String
+}
+
+type InstagramDetails @aws_cognito_user_pools {
+  id: String
+  userId: String
+  profilePictureUrl: String
+  username: String
+  name: String
+  accountType: String
+  followersCount: Int
+  followsCount: Int
+  mediaCount: Int
+  isInstagramSubscribed: Boolean
+  instagramRefreshToken: String
+  instagramRefreshTokenUpdatedAt: AWSDateTime
+  updatedAt: AWSDateTime
+}
+
+type User @aws_cognito_user_pools {
+  id: String!
+  name: String
+  phoneNo: String
+  email: String!
+  instagramDetails: InstagramDetails
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
+}
+
+input UserInput {
+  id: String!
+  name: String
+  phoneNo: String
+  email: String
+}
+
+input LinkInstagramAccountInput {
+  userId: String
+  authCode: String
+}
+
+type UserResult @aws_cognito_user_pools {
+  success: Boolean
+  message: String
+  items: [User]
+}
+
+type Mutation {
+  manageUser(action: API_ACTIONS!, input: UserInput!): UserResult @aws_cognito_user_pools
+  linkInstagramAccount(input: LinkInstagramAccountInput!): SyncResponse @aws_cognito_user_pools
+}
+
+schema {
+  query: Query
+  mutation: Mutation
+}

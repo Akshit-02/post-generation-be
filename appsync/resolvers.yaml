@@ -1,0 +1,66 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: AppSync API resolvers for Instagram Automation
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+  StackName:
+    Type: String
+    Default: post-generation-dev
+  LogLevel:
+    Type: String
+    Default: INFO
+    Description: Log level for Lambda functions
+  MediaAssetsBucketName:
+    Type: String
+    Description: Name of the S3 media assets bucket
+  LambdaRoleArn:
+    Type: String
+    Description: Lambda execution role ARN
+  CommonLambdaLayer:
+    Type: String
+    Description: Common Lambda layer ARN
+  DynamoDBLayer:
+    Type: String
+    Description: DynamoDB Lambda layer ARN
+  UtilsLayer:
+    Type: String
+    Description: Utils Lambda layer ARN
+  InstagramAppId:
+    Type: String
+    Description: Instagram App ID
+    NoEcho: true
+  InstagramAppSecret:
+    Type: String
+    Description: Instagram App Secret
+    NoEcho: true
+  UsersTableName:
+    Type: String
+    Description: DynamoDB Users table name
+
+Resources:
+  AiIntegrationFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${StackName}-ai-integration"
+      CodeUri: handlers/aiIntegration
+      Handler: index.handler
+      Role: !Ref LambdaRoleArn
+      Runtime: nodejs20.x
+      Timeout: 900
+      Environment:
+        Variables:
+          ENVIRONMENT: !Ref Environment
+          LOG_LEVEL: !Ref LogLevel
+          S3_BUCKET_NAME: !Ref MediaAssetsBucketName
+      Layers:
+        - !Ref CommonLambdaLayer
+        - !Ref UtilsLayer
+        - !Ref DynamoDBLayer
+
+Outputs:
+  AiIntegrationFunctionArn:
+    Description: "ARN of the AI Integration function"
+    Value: !GetAtt AiIntegrationFunction.Arn

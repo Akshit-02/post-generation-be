@@ -1,0 +1,34 @@
+type AnalysisScore {
+  score: Int!
+  detected: Boolean!
+  keywords: [String]
+}
+
+type CommentAnalysis {
+  vulgarity: AnalysisScore!
+  nudity: AnalysisScore!
+  violence: AnalysisScore!
+  hate_speech: AnalysisScore!
+  spam: AnalysisScore!
+  harassment: AnalysisScore!
+  overall_risk: String!
+  language_detected: String!
+  summary: String!
+  error: Boolean
+  script_detected: String
+  cultural_context: String
+  requires_human_review: Boolean
+  error_message: String
+  analyzed_at: String
+  is_hinglish: Boolean
+}
+
+type CommentAnalysisResult {
+  commentId: String!
+  analysis: CommentAnalysis!
+}
+
+type Query {
+  analyzeCommentsBatch(comments: [String!]): [CommentAnalysisResult]
+    @aws_cognito_user_pools
+}
