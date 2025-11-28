@@ -1,11 +1,21 @@
-import Logger from "/opt/nodejs/logger.js";
+import { generateIdeas } from "../helpers/groq.js";
+import { getNews } from "../helpers/parser.js";
 
 export const generateIdeasForPostHandler = async (event) => {
   try {
-    Logger.info("Generating ideas for post with event:", event);
-    return { success: true, message: "Ideas generation triggered" };
+    const { industry } = event.arguments;
+
+    const newsResponse = await getNews(industry);
+
+    const ideasResponse = await generateIdeas(newsResponse);
+
+    return {
+      success: true,
+      message: "Ideas generation triggered",
+      ideas: ideasResponse,
+    };
   } catch (error) {
-    Logger.error("Error in generateIdeasForPost:", error);
+    console.error("Error in generateIdeasForPost:", error);
     return { success: false, message: "Failed to generate ideas" };
   }
 };

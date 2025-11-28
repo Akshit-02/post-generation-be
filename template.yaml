@@ -90,7 +90,6 @@ Resources:
         LambdaRoleArn: !GetAtt LambdaRole.Arn
         CommonLambdaLayer: !GetAtt LambdaLayers.Outputs.CommonLambdaLayer
         DynamoDBLayer: !GetAtt LambdaLayers.Outputs.DynamoDBLayer
-        UtilsLayer: !GetAtt LambdaLayers.Outputs.UtilsLayer
         UsersTableName: !GetAtt DynamoDB.Outputs.UsersTableName
 
   AppSync:
@@ -106,7 +105,6 @@ Resources:
         LambdaRoleArn: !GetAtt LambdaRole.Arn
         CommonLambdaLayer: !GetAtt LambdaLayers.Outputs.CommonLambdaLayer
         DynamoDBLayer: !GetAtt LambdaLayers.Outputs.DynamoDBLayer
-        UtilsLayer: !GetAtt LambdaLayers.Outputs.UtilsLayer
         InstagramAppId: !Ref InstagramAppId
         InstagramAppSecret: !Ref InstagramAppSecret
         GroqApiKey: !Ref GroqApiKey

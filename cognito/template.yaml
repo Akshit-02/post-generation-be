@@ -22,9 +22,6 @@ Parameters:
   DynamoDBLayer:
     Type: String
     Description: ARN of the DynamoDB Lambda layer
-  UtilsLayer:
-    Type: String
-    Description: ARN of the Utils Lambda layer
   UsersTableName:
     Type: String
     Description: Name of the DynamoDB Users table
@@ -50,7 +47,6 @@ Resources:
       Role: !Ref LambdaRoleArn
       Layers:
         - !Ref CommonLambdaLayer
-        - !Ref UtilsLayer
 
   UserPostConfirmationFunction:
     Type: AWS::Serverless::Function
@@ -61,7 +57,6 @@ Resources:
       Role: !Ref LambdaRoleArn
       Layers:
         - !Ref CommonLambdaLayer
-        - !Ref UtilsLayer
         - !Ref DynamoDBLayer
 
   UserPreSignupPermission:

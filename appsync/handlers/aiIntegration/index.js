@@ -1,9 +1,7 @@
 import { generateIdeasForPostHandler } from "./resolvers/generateIdeasForPost.js";
 import { generatePostsHandler } from "./resolvers/generatePosts.js";
-import Logger from "/opt/nodejs/logger.js";
 
 export const handler = async (event) => {
-  Logger.info(`🚀 EVENT: ${JSON.stringify(event)}`);
   const { fieldName } = event;
 
   try {
@@ -16,6 +14,6 @@ export const handler = async (event) => {
         throw new Error(`Unsupported operation: ${fieldName}`);
     }
   } catch (error) {
-    Logger.error("Error in aiIntegration lambda:", error);
+    console.error("Error in aiIntegration lambda:", error);
   }
 };

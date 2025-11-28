@@ -36,23 +36,8 @@ Resources:
     Metadata:
       BuildMethod: nodejs22.x
 
-  UtilsLayer:
-    Type: AWS::Serverless::LayerVersion
-    Properties:
-      LayerName: !Sub "${StackName}-utils-layer"
-      Description: Utils
-      ContentUri: utils
-      CompatibleRuntimes:
-        - nodejs22.x
-    UpdateReplacePolicy: Delete
-    DeletionPolicy: Delete
-    Metadata:
-      BuildMethod: nodejs22.x
-
 Outputs:
   CommonLambdaLayer:
     Value: !Ref CommonLambdaLayer
   DynamoDBLayer:
     Value: !Ref DynamoDBLayer
-  UtilsLayer:
-    Value: !Ref UtilsLayer

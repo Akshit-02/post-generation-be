@@ -1,35 +1,36 @@
-type PostIdea @aws_cognito_user_pools {
-  idea: ID!
+type PostIdea @aws_cognito_user_pools @aws_api_key {
+  idea: String
   hook: String
   story: String
   visualText: String
   imagePrompt: String
+  caption: String
   imageUrl: String
 }
 
-type GenerateIdeasForPostResponse @aws_cognito_user_pools {
+type GenerateIdeasForPostResponse @aws_cognito_user_pools @aws_api_key {
   success: Boolean
   message: String
   ideas: [PostIdea]
 }
 
 input GeneratePostsInput {
-  idea: ID!
+  idea: String!
   hook: String
   story: String
   visualText: String
   imagePrompt: String
 }
 
-type GeneratePostResponse @aws_cognito_user_pools {
+type GeneratePostResponse @aws_cognito_user_pools @aws_api_key {
   success: Boolean
   message: String
   posts: [PostIdea]
 }
 
 type Query {
-  generateIdeasForPost(userId: ID!, industry: String!): GenerateIdeasForPostResponse @aws_cognito_user_pools
-  generatePosts(input: [GeneratePostsInput]!): GeneratePostResponse @aws_cognito_user_pools
+  generateIdeasForPost(industry: String!): GenerateIdeasForPostResponse @aws_cognito_user_pools @aws_api_key
+  generatePosts(input: [GeneratePostsInput]!): GeneratePostResponse @aws_cognito_user_pools @aws_api_key
   getUserById(id: String!): User @aws_cognito_user_pools
 }
 
