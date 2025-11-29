@@ -31,10 +31,11 @@ Generate only the image.
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        inputs: prompt,
+        inputs: item?.imagePrompt,
       }),
     }
   );
+  console.log("res", response);
 
   if (!response.ok) {
     throw new Error(`Image generation failed with status: ${response.status}`);

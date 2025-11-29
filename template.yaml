@@ -54,14 +54,6 @@ Resources:
     UpdateReplacePolicy: Delete
     DeletionPolicy: Delete
 
-  LambdaLayers:
-    Type: AWS::Serverless::Application
-    Properties:
-      Location: ./layers/template.yaml
-      Parameters:
-        Environment: !Ref Environment
-        StackName: !Ref StackName
-
   S3Bucket:
     Type: AWS::Serverless::Application
     Properties:
@@ -88,8 +80,6 @@ Resources:
         StackName: !Ref StackName
         LogLevel: !Ref LogLevel
         LambdaRoleArn: !GetAtt LambdaRole.Arn
-        CommonLambdaLayer: !GetAtt LambdaLayers.Outputs.CommonLambdaLayer
-        DynamoDBLayer: !GetAtt LambdaLayers.Outputs.DynamoDBLayer
         UsersTableName: !GetAtt DynamoDB.Outputs.UsersTableName
 
   AppSync:
@@ -103,8 +93,6 @@ Resources:
         MediaAssetsBucketName: !GetAtt S3Bucket.Outputs.MediaAssetsBucketName
         UserUserPoolId: !GetAtt Cognito.Outputs.UserUserPoolId
         LambdaRoleArn: !GetAtt LambdaRole.Arn
-        CommonLambdaLayer: !GetAtt LambdaLayers.Outputs.CommonLambdaLayer
-        DynamoDBLayer: !GetAtt LambdaLayers.Outputs.DynamoDBLayer
         InstagramAppId: !Ref InstagramAppId
         InstagramAppSecret: !Ref InstagramAppSecret
         GroqApiKey: !Ref GroqApiKey

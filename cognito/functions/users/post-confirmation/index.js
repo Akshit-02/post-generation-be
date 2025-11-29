@@ -1,4 +1,8 @@
-import { genericCreate } from "/opt/nodejs/dynamodb.js";
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
+
+const client = new DynamoDBClient();
+const db = DynamoDBDocumentClient.from(client);
 
 const { USERS_TABLE } = process.env;
 
@@ -19,7 +23,9 @@ export const handler = async (event) => {
         updatedAt: now,
       };
 
-      await genericCreate(USERS_TABLE, userPayload);
+      await db.send(
+        new PutCommand({ TableName: USERS_TABLE, Item: userPayload })
+      );
     }
 
     return event;

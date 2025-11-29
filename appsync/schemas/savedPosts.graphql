@@ -1,6 +1,13 @@
 type SavedPost @aws_cognito_user_pools {
   id: String!
   userId: String!
+  idea: String
+  hook: String
+  story: String
+  visualText: String
+  imagePrompt: String
+  caption: String
+  imageUrl: String
   createdAt: AWSDateTime
   updatedAt: AWSDateTime
 }
@@ -10,11 +17,23 @@ type SavedPostResponse @aws_cognito_user_pools {
   nextToken: String
 }
 
+input CreateSavedPostInput {
+  userId: String!
+  idea: String
+  hook: String
+  story: String
+  visualText: String
+  imagePrompt: String
+  caption: String
+  imageUrl: String
+}
+
 type Query {
   getSavedPostByUserId(userId: String!): SavedPostResponse
     @aws_cognito_user_pools
 }
 
 type Mutation {
-  createSavedPost(userId: String!): SavedPost @aws_cognito_user_pools
+  createSavedPost(input: CreateSavedPostInput!): SavedPost
+    @aws_cognito_user_pools
 }

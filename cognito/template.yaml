@@ -16,12 +16,6 @@ Parameters:
   LambdaRoleArn:
     Type: String
     Description: ARN of the Lambda execution role
-  CommonLambdaLayer:
-    Type: String
-    Description: ARN of the Common Lambda layer
-  DynamoDBLayer:
-    Type: String
-    Description: ARN of the DynamoDB Lambda layer
   UsersTableName:
     Type: String
     Description: Name of the DynamoDB Users table
@@ -45,8 +39,6 @@ Resources:
       FunctionName: !Sub "${StackName}-users-pre-signup"
       Handler: index.handler
       Role: !Ref LambdaRoleArn
-      Layers:
-        - !Ref CommonLambdaLayer
 
   UserPostConfirmationFunction:
     Type: AWS::Serverless::Function
@@ -55,9 +47,6 @@ Resources:
       FunctionName: !Sub "${StackName}-users-post-confirmation"
       Handler: index.handler
       Role: !Ref LambdaRoleArn
-      Layers:
-        - !Ref CommonLambdaLayer
-        - !Ref DynamoDBLayer
 
   UserPreSignupPermission:
     Type: AWS::Lambda::Permission

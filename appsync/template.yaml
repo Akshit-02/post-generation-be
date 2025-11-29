@@ -19,12 +19,6 @@ Parameters:
   LambdaRoleArn:
     Type: String
     Description: ARN of the Lambda execution role
-  CommonLambdaLayer:
-    Type: String
-    Description: ARN of the Common Lambda layer
-  DynamoDBLayer:
-    Type: String
-    Description: ARN of the DynamoDB Lambda layer
   UserUserPoolId:
     Type: String
     Description: Cognito User User Pool ID for API authentication
@@ -109,8 +103,6 @@ Resources:
         LogLevel: !Ref LogLevel
         MediaAssetsBucketName: !Ref MediaAssetsBucketName
         LambdaRoleArn: !Ref LambdaRoleArn
-        CommonLambdaLayer: !Ref CommonLambdaLayer
-        DynamoDBLayer: !Ref DynamoDBLayer
         InstagramAppId: !Ref InstagramAppId
         InstagramAppSecret: !Ref InstagramAppSecret
         GroqApiKey: !Ref GroqApiKey
@@ -211,6 +203,13 @@ Resources:
               Version: 1.0.0
             Pipeline:
               - generatePostsFn
+
+          getSavedPostByUserId:
+            Runtime:
+              Name: APPSYNC_JS
+              Version: 1.0.0
+            Pipeline:
+              - getSavedPostByUserIdFn
 
         Mutation:
           createPublishedPost:

@@ -19,12 +19,6 @@ Parameters:
   LambdaRoleArn:
     Type: String
     Description: Lambda execution role ARN
-  CommonLambdaLayer:
-    Type: String
-    Description: Common Lambda layer ARN
-  DynamoDBLayer:
-    Type: String
-    Description: DynamoDB Lambda layer ARN
   InstagramAppId:
     Type: String
     Description: Instagram App ID
@@ -64,9 +58,6 @@ Resources:
           INSTAGRAM_APP_SECRET: !Ref InstagramAppSecret
           GROQ_API_KEY: !Ref GroqApiKey
           HUGGING_FACE_API_KEY: !Ref HuggingFaceApiKey
-      Layers:
-        - !Ref CommonLambdaLayer
-        - !Ref DynamoDBLayer
 
 Outputs:
   AiIntegrationFunctionArn:

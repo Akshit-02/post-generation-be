@@ -55,13 +55,20 @@ type PublishedPostResponse @aws_cognito_user_pools {
 
 type Mutation {
   createPublishedPost(userId: String!): PublishedPost @aws_cognito_user_pools
-  createSavedPost(userId: String!): SavedPost @aws_cognito_user_pools
+  createSavedPost(input: CreateSavedPostInput!): SavedPost @aws_cognito_user_pools
   linkInstagramAccount(input: LinkInstagramAccountInput!): SyncResponse @aws_cognito_user_pools
 }
 
 type SavedPost @aws_cognito_user_pools {
   id: String!
   userId: String!
+  idea: String
+  hook: String
+  story: String
+  visualText: String
+  imagePrompt: String
+  caption: String
+  imageUrl: String
   createdAt: AWSDateTime
   updatedAt: AWSDateTime
 }
@@ -69,6 +76,17 @@ type SavedPost @aws_cognito_user_pools {
 type SavedPostResponse @aws_cognito_user_pools {
   items: [SavedPost]
   nextToken: String
+}
+
+input CreateSavedPostInput {
+  userId: String!
+  idea: String
+  hook: String
+  story: String
+  visualText: String
+  imagePrompt: String
+  caption: String
+  imageUrl: String
 }
 
 type User @aws_cognito_user_pools {
